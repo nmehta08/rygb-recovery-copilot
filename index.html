@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="description"
+    content="RYGB Recovery Copilot: a prototype interface for longitudinal postoperative recovery assessment after Roux-en-Y gastric bypass."
+  />
+
+  <title>RYGB Recovery Copilot</title>
+
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f9fafc;
+
+      --text: #172033;
+      --text-soft: #536174;
+      --muted: #7c8798;
+
+      --border: #e1e6ed;
+
+      --blue: #2455d6;
+      --blue-dark: #163ca3;
+      --blue-soft: #edf2ff;
+
+      --green: #17765a;
+      --green-soft: #e9f7f1;
+
+      --amber: #a46300;
+      --amber-soft: #fff4db;
+
+      --red: #b43a3a;
+      --red-soft: #fcecec;
+
+      --purple: #6a4cc7;
+      --purple-soft: #f1edff;
+
+      --shadow:
+        0 1px 2px rgba(20, 31, 50, 0.03),
+        0 10px 30px rgba(20, 31, 50, 0.06);
+
+      --radius: 18px;
+      --radius-small: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      line-height: 1.5;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      max-width: 1500px;
+      margin: auto;
+      padding: 14px 24px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+
+      display: grid;
+      place-items: center;
+
+      background: linear-gradient(145deg, var(--blue), var(--blue-dark));
+      color: white;
+
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-subtitle {
+      margin-top: 1px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .prototype-badge {
+      padding: 7px 11px;
+      border-radius: 999px;
+
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* PAGE */
+
+    .page {
+      max-width: 1500px;
+      margin: auto;
+      padding: 26px 24px 70px;
+    }
+
+    /* PATIENT HEADER */
+
+    .patient-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+
+      padding: 24px;
+
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .patient-name {
+      margin: 4px 0 2px;
+
+      font-size: clamp(27px, 3vw, 38px);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+    }
+
+    .patient-description {
+      color: var(--text-soft);
+      font-size: 14px;
+    }
+
+    .patient-meta {
+      margin-top: 18px;
+
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 8px 11px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+
+      background: var(--surface-soft);
+      color: var(--text-soft);
+
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .status-card {
+      min-width: 230px;
+      align-self: stretch;
+
+      padding: 18px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      border-radius: 15px;
+
+      background: linear-gradient(145deg, #edf8f4, #f8fcfa);
+      border: 1px solid #cfe9de;
+    }
+
+    .status-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .status-main {
+      margin-top: 5px;
+
+      color: var(--green);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .status-description {
+      margin-top: 4px;
+
+      color: var(--text-soft);
+      font-size: 12px;
+    }
+
+    /* NAVIGATION */
+
+    .tabs {
+      margin: 22px 0;
+
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+
+      padding: 5px;
+
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .tab {
+      min-width: max-content;
+
+      padding: 10px 14px;
+
+      border: 0;
+      border-radius: 10px;
+
+      background: transparent;
+      color: var(--text-soft);
+
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tab:hover {
+      background: var(--surface-soft);
+    }
+
+    .tab.active {
+      background: var(--blue);
+      color: white;
+    }
+
+    /* SECTIONS */
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .section-title-row {
+      margin-bottom: 14px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 20px;
+    }
+
+    .section-title {
+      margin: 0;
+
+      font-size: 20px;
+      letter-spacing: -0.025em;
+    }
+
+    .section-description {
+      margin-top: 4px;
+
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* METRICS */
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 17px;
+
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .metric-value {
+      margin-top: 7px;
+
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+    }
+
+    .metric-subtext {
+      margin-top: 3px;
+
+      color: var(--text-soft);
+      font-size: 12px;
+    }
+
+    /* GRID */
+
+    .dashboard-grid {
+      margin-top: 14px;
+
+      display: grid;
+      grid-template-columns: 1.45fr 0.8fr;
+      gap: 14px;
+    }
+
+    .card {
+      padding: 20px;
+
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .card-title {
+      margin: 0;
+
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .card-description {
+      margin: 3px 0 18px;
+
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* OVERVIEW */
+
+    .clinical-summary {
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .clinical-summary strong {
+      color: var(--text);
+    }
+
+    .highlight-box {
+      margin-top: 18px;
+      padding: 15px 16px;
+
+      border-left: 4px solid var(--amber);
+      border-radius: 10px;
+
+      background: var(--amber-soft);
+    }
+
+    .highlight-title {
+      color: #704800;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .highlight-text {
+      margin-top: 3px;
+
+      color: #705820;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    /* RECOVERY DOMAINS */
+
+    .domain-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .domain-row {
+      padding: 13px 0;
+
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 15px;
+
+      border-bottom: 1px solid var(--border);
+    }
+
+    .domain-row:last-child {
+      border-bottom: 0;
+    }
+
+    .domain-name {
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .domain-detail {
+      margin-top: 2px;
+
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .signal {
+      height: fit-content;
+
+      padding: 6px 9px;
+      border-radius: 999px;
+
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .signal.good {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .signal.watch {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .signal.alert {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    /* TIMELINE */
+
+    .timeline {
+      position: relative;
+
+      display: grid;
+      gap: 0;
+    }
+
+    .timeline::before {
+      content: "";
+
+      position: absolute;
+      left: 16px;
+      top: 10px;
+      bottom: 22px;
+
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+
+      padding: 0 0 27px 49px;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: 8px;
+      top: 3px;
+
+      width: 18px;
+      height: 18px;
+
+      border: 4px solid var(--surface);
+      border-radius: 50%;
+
+      background: var(--blue);
+      box-shadow: 0 0 0 2px var(--blue-soft);
+    }
+
+    .timeline-time {
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .timeline-title {
+      margin-top: 2px;
+
+      font-weight: 760;
+      font-size: 14px;
+    }
+
+    .timeline-copy {
+      margin-top: 4px;
+
+      color: var(--text-soft);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    /* TRAJECTORY */
+
+    .trajectory {
+      margin-top: 8px;
+
+      display: grid;
+      grid-template-columns: repeat(7, minmax(90px, 1fr));
+      gap: 8px;
+
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .trajectory-point {
+      position: relative;
+
+      min-width: 100px;
+      padding: 14px 12px;
+
+      border-radius: 13px;
+      border: 1px solid var(--border);
+
+      background: var(--surface-soft);
+    }
+
+    .trajectory-point.current {
+      border-color: #aebffc;
+      background: var(--blue-soft);
+    }
+
+    .trajectory-day {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .trajectory-state {
+      margin-top: 4px;
+
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .trajectory-note {
+      margin-top: 3px;
+
+      color: var(--text-soft);
+      font-size: 11px;
+    }
+
+    /* SIGNALS */
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .signal-card {
+      padding: 17px;
+
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: var(--surface);
+    }
+
+    .signal-card.watch {
+      border-color: #f0d59d;
+      background: #fffdf7;
+    }
+
+    .signal-card.alert {
+      border-color: #efc4c4;
+      background: #fffafa;
+    }
+
+    .signal-card-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      align-items: start;
+    }
+
+    .signal-card-name {
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .signal-card-copy {
+      margin-top: 7px;
+
+      color: var(--text-soft);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .source-line {
+      margin-top: 12px;
+
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    /* WHAT DOESN'T FIT */
+
+    .question-panel {
+      padding: 24px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(36, 85, 214, 0.06),
+          rgba(106, 76, 199, 0.04)
+        ),
+        var(--surface);
+
+      border: 1px solid #d8e1fa;
+      border-radius: var(--radius);
+    }
+
+    .question-title {
+      margin: 0;
+
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .question-copy {
+      max-width: 800px;
+      margin: 6px 0 18px;
+
+      color: var(--text-soft);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .question-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .question-button {
+      padding: 10px 14px;
+
+      border: 1px solid #cbd7f4;
+      border-radius: 11px;
+
+      background: white;
+      color: var(--blue-dark);
+
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .question-button:hover {
+      background: var(--blue-soft);
+    }
+
+    .answer-box {
+      display: none;
+
+      margin-top: 18px;
+      padding: 17px;
+
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .answer-box.visible {
+      display: block;
+    }
+
+    .answer-label {
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .answer-text {
+      margin-top: 6px;
+
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    /* FOOTER */
+
+    .disclaimer {
+      margin-top: 28px;
+      padding: 16px 18px;
+
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-soft);
+    }
+
+    .footer {
+      padding: 20px 0 0;
+
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 1000px) {
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        padding: 16px 14px 50px;
+      }
+
+      .topbar-inner {
+        padding: 12px 14px;
+      }
+
+      .patient-header {
+        grid-template-columns: 1fr;
+        padding: 20px;
+      }
+
+      .status-card {
+        min-width: 0;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .signal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .prototype-badge {
+        display: none;
+      }
+
+      .footer {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-inner">
+
+      <div class="brand">
+        <div class="logo">R</div>
+
+        <div>
+          <div class="brand-title">RYGB Recovery Copilot</div>
+          <div class="brand-subtitle">
+            Longitudinal postoperative recovery prototype
+          </div>
+        </div>
+      </div>
+
+      <div class="prototype-badge">
+        Clinical Concept Prototype
+      </div>
+
+    </div>
+  </header>
+
+  <main class="page">
+
+    <!-- PATIENT HEADER -->
+    <section class="patient-header">
+
+      <div>
+        <div class="eyebrow">
+          Roux-en-Y Gastric Bypass
+        </div>
+
+        <h1 class="patient-name">
+          Demo Patient
+        </h1>
+
+        <div class="patient-description">
+          46-year-old woman · Postoperative Day 12 · Longitudinal recovery view
+        </div>
+
+        <div class="patient-meta">
+          <span class="chip">Pre-op BMI 46.2 kg/m²</span>
+          <span class="chip">T2DM</span>
+          <span class="chip">OSA</span>
+          <span class="chip">Hypertension</span>
+          <span class="chip">Iron deficiency history</span>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-label">
+          Current Recovery State
+        </div>
+
+        <div class="status-main">
+          Mostly Expected
+        </div>
+
+        <div class="status-description">
+          One emerging domain deserves closer review: hydration and oral tolerance.
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TABS -->
+    <nav class="tabs" aria-label="Patient recovery views">
+      <button class="tab active" data-view="overview">Overview</button>
+      <button class="tab" data-view="timeline">Timeline</button>
+      <button class="tab" data-view="domains">Recovery Domains</button>
+      <button class="tab" data-view="signals">Clinical Signals</button>
+      <button class="tab" data-view="copilot">Clinical Reasoning</button>
+    </nav>
+
+    <!-- OVERVIEW -->
+    <section class="view active" id="overview">
+
+      <div class="metrics">
+
+        <div class="metric">
+          <div class="metric-label">Postoperative Day</div>
+          <div class="metric-value">12</div>
+          <div class="metric-subtext">RYGB completed without documented intraoperative complication</div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">Current Weight</div>
+          <div class="metric-value">271 lb</div>
+          <div class="metric-subtext">Preoperative weight: 287 lb</div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">Total Weight Loss</div>
+          <div class="metric-value">5.6%</div>
+          <div class="metric-subtext">Early postoperative trajectory</div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">Active Signals</div>
+          <div class="metric-value">2</div>
+          <div class="metric-subtext">Hydration + oral tolerance</div>
+        </div>
+
+      </div>
+
+      <div class="dashboard-grid">
+
+        <div class="card">
+
+          <h2 class="card-title">
+            Clinical Story
+          </h2>
+
+          <div class="card-description">
+            A concise longitudinal reconstruction of this patient's recovery.
+          </div>
+
+          <div class="clinical-summary">
+            The patient underwent <strong>laparoscopic Roux-en-Y gastric bypass</strong>
+            12 days ago. The procedure was completed without a documented intraoperative
+            complication. Early postoperative pain and nausea initially improved.
+
+            <br><br>
+
+            Weight loss is progressing and there is no recorded fever or sustained
+            tachycardia. The patient's course remains broadly consistent with expected
+            early recovery.
+
+            <br><br>
+
+            Over the last several days, however, <strong>fluid intake has declined</strong>
+            while nausea has increased. The patient now reports intermittent dizziness
+            and constipation. These changes represent a shift from the prior improving
+            trajectory and merit focused clinical reassessment.
+          </div>
+
+          <div class="highlight-box">
+
+            <div class="highlight-title">
+              Emerging change
+            </div>
+
+            <div class="highlight-text">
+              The key finding is not simply that nausea is present. Nausea had been
+              improving and has now worsened alongside reduced fluid intake. The
+              direction of change is clinically more informative than an isolated symptom.
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <h2 class="card-title">
+            Four-Domain Snapshot
+          </h2>
+
+          <div class="card-description">
+            Current postoperative assessment at a glance.
+          </div>
+
+          <div class="domain-list">
+
+            <div class="domain-row">
+              <div>
+                <div class="domain-name">Vitals & Complication Surveillance</div>
+                <div class="domain-detail">
+                  No persistent fever or tachycardia documented
+                </div>
+              </div>
+
+              <span class="signal good">Expected</span>
+            </div>
+
+            <div class="domain-row">
+              <div>
+                <div class="domain-name">Weight & Anthropometrics</div>
+                <div class="domain-detail">
+                  Early weight trajectory progressing
+                </div>
+              </div>
+
+              <span class="signal good">Expected</span>
+            </div>
+
+            <div class="domain-row">
+              <div>
+                <div class="domain-name">Nutrition & Hydration</div>
+                <div class="domain-detail">
+                  Oral fluid intake declining
+                </div>
+              </div>
+
+              <span class="signal watch">Review</span>
+            </div>
+
+            <div class="domain-row">
+              <div>
+                <div class="domain-name">Symptoms & Patient Experience</div>
+                <div class="domain-detail">
+                  Nausea increasing after initial improvement
+                </div>
+              </div>
+
+              <span class="signal watch">Changing</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+
+        <h2 class="card-title">
+          Recovery Trajectory
+        </h2>
+
+        <div class="card-description">
+          Expected milestones compared with the patient's evolving course.
+        </div>
+
+        <div class="trajectory">
+
+          <div class="trajectory-point">
+            <div class="trajectory-day">Surgery</div>
+            <div class="trajectory-state">Procedure</div>
+            <div class="trajectory-note">RYGB completed</div>
+          </div>
+
+          <div class="trajectory-point">
+            <div class="trajectory-day">POD 1</div>
+            <div class="trajectory-state">Early recovery</div>
+            <div class="trajectory-note">Pain + nausea</div>
+          </div>
+
+          <div class="trajectory-point">
+            <div class="trajectory-day">POD 3</div>
+            <div class="trajectory-state">Improving</div>
+            <div class="trajectory-note">PO intake increasing</div>
+          </div>
+
+          <div class="trajectory-point">
+            <div class="trajectory-day">POD 7</div>
+            <div class="trajectory-state">Expected</div>
+            <div class="trajectory-note">Symptoms improving</div>
+          </div>
+
+          <div class="trajectory-point current">
+            <div class="trajectory-day">POD 12</div>
+            <div class="trajectory-state">Changing</div>
+            <div class="trajectory-note">↓ fluid intake</div>
+          </div>
+
+          <div class="trajectory-point">
+            <div class="trajectory-day">Week 2</div>
+            <div class="trajectory-state">Review</div>
+            <div class="trajectory-note">Clinical follow-up</div>
+          </div>
+
+          <div class="trajectory-point">
+            <div class="trajectory-day">Month 2</div>
+            <div class="trajectory-state">Next phase</div>
+            <div class="trajectory-note">Nutrition + metabolic review</div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TIMELINE -->
+    <section class="view" id="timeline">
+
+      <div class="section-title-row">
+        <div>
+          <h2 class="section-title">
+            Patient Timeline
+          </h2>
+
+          <div class="section-description">
+            Recovery is interpreted as a sequence, not a collection of isolated observations.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="timeline">
+
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-time">
+              Preoperative
+            </div>
+
+            <div class="timeline-title">
+              Baseline patient state established
+            </div>
+
+            <div class="timeline-copy">
+              BMI 46.2 kg/m². Type 2 diabetes, obstructive sleep apnea,
+              hypertension and previous iron deficiency documented.
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-time">
+              Surgery
+            </div>
+
+            <div class="timeline-title">
+              Laparoscopic RYGB performed
+            </div>
+
+            <div class="timeline-copy">
+              Procedure completed without a documented intraoperative complication.
+              Operative findings become part of the patient's postoperative context.
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-time">
+              POD 1
+            </div>
+
+            <div class="timeline-title">
+              Expected early postoperative symptoms
+            </div>
+
+            <div class="timeline-copy">
+              Moderate pain and nausea with early oral intake. Ambulation initiated.
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-time">
+              POD 3 to 7
+            </div>
+
+            <div class="timeline-title">
+              Recovery trend improving
+            </div>
+
+            <div class="timeline-copy">
+              Pain decreased, nausea improved and oral fluid tolerance increased.
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-time">
+              POD 9
+            </div>
+
+            <div class="timeline-title">
+              Oral intake begins to decline
+            </div>
+
+            <div class="timeline-copy">
+              Patient reports increasing difficulty meeting hydration goals.
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-time">
+              POD 12 · Current
+            </div>
+
+            <div class="timeline-title">
+              Recovery trajectory warrants reassessment
+            </div>
+
+            <div class="timeline-copy">
+              Nausea has increased after previous improvement. Fluid intake remains
+              below goal with intermittent dizziness and constipation.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- DOMAINS -->
+    <section class="view" id="domains">
+
+      <div class="section-title-row">
+        <div>
+          <h2 class="section-title">
+            Recovery Domains
+          </h2>
+
+          <div class="section-description">
+            Structured assessment across the key dimensions of early RYGB recovery.
+          </div>
+        </div>
+      </div>
+
+      <div class="signal-grid">
+
+        <div class="signal-card">
+
+          <div class="signal-card-title">
+            <div class="signal-card-name">
+              Vitals & Surgical Surveillance
+            </div>
+
+            <span class="signal good">Expected</span>
+          </div>
+
+          <div class="signal-card-copy">
+            No persistent fever or sustained tachycardia has been documented.
+            There is currently no recorded physiologic pattern independently
+            establishing a postoperative surgical complication.
+          </div>
+
+          <div class="source-line">
+            Example inputs: heart rate · temperature · blood pressure · SpO₂ · pain · vomiting
+          </div>
+
+        </div>
+
+        <div class="signal-card">
+
+          <div class="signal-card-title">
+            <div class="signal-card-name">
+              Weight & Anthropometrics
+            </div>
+
+            <span class="signal good">Expected</span>
+          </div>
+
+          <div class="signal-card-copy">
+            Early weight reduction is progressing. Weight should be interpreted
+            alongside intake and hydration rather than treated as an isolated
+            indicator of successful recovery.
+          </div>
+
+          <div class="source-line">
+            Example inputs: weight · BMI · % total weight loss · weight velocity
+          </div>
+
+        </div>
+
+        <div class="signal-card watch">
+
+          <div class="signal-card-title">
+            <div class="signal-card-name">
+              Nutrition & Hydration
+            </div>
+
+            <span class="signal watch">Review</span>
+          </div>
+
+          <div class="signal-card-copy">
+            Fluid intake has declined over several days. The trend becomes more
+            relevant because it occurs alongside increasing nausea and dizziness.
+          </div>
+
+          <div class="source-line">
+            Example inputs: fluid intake · PO tolerance · labs · supplements · diet stage
+          </div>
+
+        </div>
+
+        <div class="signal-card watch">
+
+          <div class="signal-card-title">
+            <div class="signal-card-name">
+              Symptoms & Patient Experience
+            </div>
+
+            <span class="signal watch">Changing</span>
+          </div>
+
+          <div class="signal-card-copy">
+            Nausea initially improved and then worsened. Constipation and intermittent
+            dizziness are newly reported symptoms that should be interpreted within
+            the broader recovery trajectory.
+          </div>
+
+          <div class="source-line">
+            Example inputs: nausea · vomiting · pain · fatigue · GI symptoms · function · QoL
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- SIGNALS -->
+    <section class="view" id="signals">
+
+      <div class="section-title-row">
+        <div>
+          <h2 class="section-title">
+            Clinical Signals
+          </h2>
+
+          <div class="section-description">
+            Signals describe changes in the recovery pattern. They are not diagnoses.
+          </div>
+        </div>
+      </div>
+
+      <div class="signal-grid">
+
+        <div class="signal-card watch">
+
+          <div class="signal-card-title">
+            <div class="signal-card-name">
+              Declining Hydration Trajectory
+            </div>
+
+            <span class="signal watch">Review</span>
+          </div>
+
+          <div class="signal-card-copy">
+            Reported fluid intake has decreased for three consecutive days after
+            initially improving. Intermittent dizziness is also now present.
+          </div>
+
+          <div class="source-line">
+            Basis: longitudinal symptom + intake trend
+          </div>
+
+        </div>
+
+        <div class="signal-card watch">
+
+          <div class="signal-card-title">
+            <div class="signal-card-name">
+              Nausea Reversal
+            </div>
+
+            <span class="signal watch">Changing</span>
+          </div>
+
+          <div class="signal-card-copy">
+            Nausea improved during the first postoperative week but has subsequently
+            increased. The reversal in direction is highlighted rather than the
+            symptom alone.
+          </div>
+
+          <div class="source-line">
+            Basis: symptom trajectory over time
+          </div>
+
+        </div>
+
+        <div class="signal-card">
+
+          <div class="signal-card-title">
+            <div class="signal-card-name">
+              Stable Recorded Vital Pattern
+            </div>
+
+            <span class="signal good">Expected</span>
+          </div>
+
+          <div class="signal-card-copy">
+            Available records do not show persistent tachycardia, fever or worsening
+            oxygen requirement.
+          </div>
+
+          <div class="source-line">
+            Basis: available recorded vital signs
+          </div>
+
+        </div>
+
+        <div class="signal-card">
+
+          <div class="signal-card-title">
+            <div class="signal-card-name">
+              Weight Trend
+            </div>
+
+            <span class="signal good">Expected</span>
+          </div>
+
+          <div class="signal-card-copy">
+            Early weight loss is present without a standalone weight signal suggesting
+            an abnormal recovery pattern. Hydration context remains important.
+          </div>
+
+          <div class="source-line">
+            Basis: weight trajectory + hydration context
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- COPILOT -->
+    <section class="view" id="copilot">
+
+      <div class="question-panel">
+
+        <div class="eyebrow">
+          Prototype Reasoning Interface
+        </div>
+
+        <h2 class="question-title">
+          Ask the recovery record
+        </h2>
+
+        <div class="question-copy">
+          This prototype does not use an AI model. These interactions demonstrate how
+          a future system could organize longitudinal patient information into
+          clinically useful questions while keeping facts, interpretation and
+          uncertainty visible.
+        </div>
+
+        <div class="question-buttons">
+
+          <button
+            class="question-button"
+            data-answer="doesnt-fit"
+          >
+            What doesn't fit?
+          </button>
+
+          <button
+            class="question-button"
+            data-answer="changed"
+          >
+            What changed?
+          </button>
+
+          <button
+            class="question-button"
+            data-answer="missing"
+          >
+            What information is missing?
+          </button>
+
+          <button
+            class="question-button"
+            data-answer="summary"
+          >
+            Give me a 20-second summary
+          </button>
+
+        </div>
+
+        <div class="answer-box" id="answerBox">
+
+          <div class="answer-label" id="answerLabel">
+            Clinical reasoning
+          </div>
+
+          <div class="answer-text" id="answerText"></div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- DISCLAIMER -->
+    <div class="disclaimer">
+      <strong>Prototype only.</strong>
+      This interface uses synthetic demonstration data and rule-based example logic.
+      It is not a medical device, does not provide medical advice, does not diagnose
+      postoperative complications, and has not been validated for clinical use.
+      Clinical decisions must remain with appropriately qualified clinicians.
+    </div>
+
+    <footer class="footer">
+      <div>
+        RYGB Recovery Copilot · MVP Concept
+      </div>
+
+      <div>
+        Longitudinal recovery · Explainable signals · Clinician-centered design
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  /*
+    RYGB Recovery Copilot
+    Static MVP
+
+    No AI model is used.
+    No patient data leaves the browser.
+    All data below are synthetic.
+  */
+
+  const tabs = document.querySelectorAll(".tab");
+  const views = document.querySelectorAll(".view");
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const requestedView = tab.dataset.view;
+
+      tabs.forEach((item) => {
+        item.classList.remove("active");
+      });
+
+      views.forEach((view) => {
+        view.classList.remove("active");
+      });
+
+      tab.classList.add("active");
+
+      const target = document.getElementById(requestedView);
+
+      if (target) {
+        target.classList.add("active");
+      }
+    });
+  });
+
+  const answers = {
+    "doesnt-fit": {
+      label: "What doesn't fit?",
+      text:
+        "The main discordant feature is the direction of the gastrointestinal recovery. Nausea and oral tolerance were improving through the first postoperative week, but nausea has now increased while fluid intake has declined. Intermittent dizziness and constipation appeared during the same period. The change from an improving trajectory to a worsening one deserves focused reassessment."
+    },
+
+    "changed": {
+      label: "What changed?",
+      text:
+        "Between approximately postoperative days 9 and 12, oral fluid intake decreased and nausea increased after previously improving. Dizziness and constipation were also newly reported. Available vital-sign information has not shown a parallel persistent fever or tachycardia signal."
+    },
+
+    "missing": {
+      label: "What information is missing?",
+      text:
+        "The current record does not contain a complete contemporaneous assessment of hydration status. Updated vital signs, quantified recent fluid intake, current urine output, physical examination findings and clinically appropriate laboratory information could reduce uncertainty. The prototype intentionally identifies missing information rather than filling gaps with assumptions."
+    },
+
+    "summary": {
+      label: "20-second summary",
+      text:
+        "46-year-old woman, postoperative day 12 after uncomplicated documented laparoscopic RYGB. Early pain and nausea improved and weight loss is progressing. Over the last several days, however, fluid intake has fallen and nausea has increased, with new intermittent dizziness and constipation. No persistent fever or tachycardia is currently documented. The main issue for reassessment is the changing hydration and oral-tolerance trajectory."
+    }
+  };
+
+  const questionButtons = document.querySelectorAll(".question-button");
+  const answerBox = document.getElementById("answerBox");
+  const answerLabel = document.getElementById("answerLabel");
+  const answerText = document.getElementById("answerText");
+
+  questionButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const answer = answers[button.dataset.answer];
+
+      if (!answer) return;
+
+      answerLabel.textContent = answer.label;
+      answerText.textContent = answer.text;
+      answerBox.classList.add("visible");
+    });
+  });
+</script>
+
+</body>
+</html>
